@@ -407,7 +407,7 @@ GameObject:
   - component: {fileID: 760844162}
   - component: {fileID: 760844161}
   m_Layer: 0
-  m_Name: CubeMaker
+  m_Name: HouseMaker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -425,10 +425,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa80897b0341986429d1b2ca955f5341, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  house: {fileID: 3688675041118734777, guid: 113e4a148c70c9f4cb91eaad036e78c0, type: 3}
-  noOfHouses: 10
+  housePrefab: {fileID: 3688675041118734777, guid: 113e4a148c70c9f4cb91eaad036e78c0, type: 3}
+  noOfHouses: 60
+  houseSeparation: 0.7
   areaRange: 5
   yOffset: 0.25
+  houseMoveDistance: 0.1
 --- !u!4 &760844162
 Transform:
   m_ObjectHideFlags: 0
