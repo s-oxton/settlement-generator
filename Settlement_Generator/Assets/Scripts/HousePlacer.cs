@@ -62,6 +62,10 @@ public class HousePlacer : MonoBehaviour
     private int noOfHouses = 10;
 
     [SerializeField]
+    [Range(1, 100)]
+    private int percentHousesOnRoad = 15;
+
+    [SerializeField]
     [Range(0.1f, 1)]
     private float houseSeparation = 0.3f;
 
@@ -89,8 +93,8 @@ public class HousePlacer : MonoBehaviour
             noOfTaverns = noOfTaverns + Mathf.FloorToInt(noOfHouses / 200);
         }
 
-        //make 1/10 houses be on the road.
-        int noOfRoadHouses = Mathf.FloorToInt(noOfHouses / 15);
+        //make a percentage of the houses stick to the road
+        int noOfRoadHouses = Mathf.FloorToInt(noOfHouses * (percentHousesOnRoad/100f));
 
         Vector3 housePosition;
 

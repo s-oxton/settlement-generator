@@ -524,6 +524,7 @@ MonoBehaviour:
   housePrefab: {fileID: 3688675041118734777, guid: 113e4a148c70c9f4cb91eaad036e78c0, type: 3}
   Road: {fileID: 554591073}
   noOfHouses: 415
+  percentHousesOnRoad: 10
   houseSeparation: 0.2
   areaRange: 14
   houseMoveDistance: 0.3
