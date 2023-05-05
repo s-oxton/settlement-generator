@@ -83,7 +83,7 @@ public class HousePlacer : MonoBehaviour
     private House[] houseArray;
 
     // Start is called before the first frame update
-    void Start()
+    /*void Start()
     {
 
         houseArray = new House[noOfHouses];
@@ -111,21 +111,11 @@ public class HousePlacer : MonoBehaviour
                 housePosition = CreateRandomLocation();
             }
 
-
-            //first couple of buildings are taverns, rest are normal houses
-            /*if (i < noOfTaverns)
-            {
-                CreateHouse(false, i, housePosition);
-            }
-            else
-            {*/
-            CreateHouse(true, i, housePosition);
-            //}
         }
 
         SpaceHouses();
 
-    }
+    }*/
 
     private void SpaceHouses()
     {
