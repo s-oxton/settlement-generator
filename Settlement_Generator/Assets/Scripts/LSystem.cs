@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -7,35 +6,24 @@ public class LSystem : MonoBehaviour
 {
     [Header("LSystem Components")]
     [SerializeField]
-    private string axiom;
+    private string[] axioms;
     [SerializeField]
     [Range(0, 8)]
     private int iterations;
     [SerializeField]
     private Rule[] rules;
 
-    [Header("LSystem Variables")]
-    [SerializeField]
-    [Range(0f, 20f)]
-    private float angleRange;
-
-    private void Start()
+    public string GenerateSentence()
     {
-        string sentence = GenerateSentence();
 
-    }
-
-    private string GenerateSentence()
-    {
-        string sentence = axiom;
-        Debug.Log(sentence);
+        string sentence = axioms[Random.Range(0, axioms.Length)];
         for (int i = 0; i < iterations; i++)
         {
             sentence = ApplyRules(sentence);
-            Debug.Log(sentence);
         }
 
         return sentence;
+
     }
 
     private string ApplyRules(string sentence)
@@ -57,11 +45,15 @@ public class LSystem : MonoBehaviour
                     viableRules.Add(rule);
                 }
             }
-            newSentence.Append(c.ToString());
+
             //if one of more rules is viable, pick one at random to apply
             if (viableRules.Count > 0)
             {
                 newSentence.Append(viableRules[Random.Range(0, viableRules.Count)].GetOutput());
+            }
+            else
+            {
+                newSentence.Append(c.ToString());
             }
         }
 

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Rule1-1
   m_EditorClassIdentifier: 
   input: F
-  output: '[+G][-G]'
+  output: G[+F][-F]
