@@ -152,9 +152,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 333512890}
-  - {fileID: 368076922}
   m_Father: {fileID: 1449643443}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &45783959
 MonoBehaviour:
@@ -172,7 +171,7 @@ MonoBehaviour:
   roadPrefab: {fileID: 1846063427524602688, guid: 64def3bbf0264c141837749b40dfd833, type: 3}
   junctionPrefab: {fileID: 6785733408643841553, guid: b10921faee84876438b85a0fd23e3165, type: 3}
   lSystem: {fileID: 333512891}
-  baseAngle: 95.9
+  baseAngle: 84.9
   angleVariance: 12.4
   roadScaling: 0.708
 --- !u!1 &47893248
@@ -279,7 +278,6 @@ GameObject:
   - component: {fileID: 57756900}
   - component: {fileID: 57756899}
   - component: {fileID: 57756898}
-  - component: {fileID: 57756897}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -287,20 +285,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!64 &57756897
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 57756896}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &57756898
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -413,7 +397,7 @@ MonoBehaviour:
   - '[G[=F]]-[F]-[G[=F]]'
   - '[G[=F]]+[F]+[G[=F]]'
   - '[G[=F]]+[F]+[G[=F]]+[F]'
-  iterations: 3
+  iterations: 2
   rules:
   - {fileID: 11400000, guid: f402589bae6e65f4aa824151d9bbb330, type: 2}
   - {fileID: 11400000, guid: 2059bd57ae136e140acae4e3a32b8de2, type: 2}
@@ -443,12 +427,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 368076921}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 45783958}
-  m_RootOrder: 1
+  m_Father: {fileID: 1449643443}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &507622818
 GameObject:
@@ -544,7 +528,7 @@ GameObject:
   - component: {fileID: 760844162}
   - component: {fileID: 760844161}
   m_Layer: 0
-  m_Name: HouseMaker
+  m_Name: House Maker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -562,11 +546,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa80897b0341986429d1b2ca955f5341, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  housePrefab: {fileID: 3688675041118734777, guid: 113e4a148c70c9f4cb91eaad036e78c0, type: 3}
-  Road: {fileID: 0}
-  noOfHouses: 415
-  percentHousesOnRoad: 10
-  houseSeparation: 0.2
+  housePrefabs:
+  - {fileID: 4569965309548989715, guid: 3619db8b8e2c3f145890e0911109bcfc, type: 3}
+  - {fileID: 5032999840456307011, guid: cabfdff98c04e13418036db70daeb011, type: 3}
+  - {fileID: 1870474636488218238, guid: ac6b3a6d83803594cbed6ea1a8200b39, type: 3}
+  - {fileID: 8870706762454521912, guid: 7325792c842c7c14684fc96b9952bdc5, type: 3}
+  - {fileID: 7814113884202352910, guid: 6ada99ff8dc5b6f45b271d3e25678e21, type: 3}
+  - {fileID: 1468891388177081012, guid: c8cbe9193146b5b439cc2fc1019ba163, type: 3}
+  tavern: {fileID: 7590649277002926812, guid: 51bbfc0cabd685944b12d5dc2a0380b8, type: 3}
+  turtle: {fileID: 368076921}
+  boundsChecker: {fileID: 7457800808667483594, guid: 18af8b8af6149cd419b0fdb43eda45f9, type: 3}
+  noOfHouses: 100
+  houseSeparation: 0.193
   areaRange: 14
   houseMoveDistance: 0.3
   spacingIterations: 27
@@ -582,7 +573,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1449643443}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1449643442
 GameObject:
@@ -593,6 +584,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1449643443}
+  - component: {fileID: 1449643444}
   m_Layer: 0
   m_Name: Settlement Generator
   m_TagString: Untagged
@@ -611,8 +603,23 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 368076922}
   - {fileID: 45783958}
   - {fileID: 760844162}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1449643444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449643442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab75e8e2a8a7e80468077e8031f10813, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roadPlacer: {fileID: 45783959}
+  housePlacer: {fileID: 760844161}

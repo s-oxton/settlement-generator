@@ -5,65 +5,23 @@ using UnityEngine;
 public class HousePlacer : MonoBehaviour
 {
 
-    class House
-    {
-        //the house object
-        private GameObject house;
-
-        //Initialiser
-        public House(GameObject thisHouse)
-        {
-            house = thisHouse;
-        }
-
-        public GameObject GetHouse()
-        {
-            return house;
-        }
-
-        public Vector3 GetPosition()
-        {
-            Vector3 location;
-
-            location = house.transform.position;
-
-            location = new Vector3(location.x, 0, location.z);
-
-            return location;
-        }
-
-        public void SetPosition(Vector3 newPosition)
-        {
-            house.transform.position = newPosition;
-        }
-
-        public Collider GetCollider()
-        {
-            return house.GetComponent<Collider>();
-        }
-
-        public void MoveHouse(Vector3 movement)
-        {
-            house.transform.position = house.transform.position + movement;
-        }
-
-    }
-
     [Header("GameObjects")]
     [SerializeField]
-    private GameObject housePrefab;
+    private GameObject[] housePrefabs;
 
     [SerializeField]
-    private GameObject Road;
+    private GameObject tavern;
+
+    [SerializeField]
+    private GameObject turtle;
+
+    [SerializeField]
+    private GameObject boundsChecker;
 
     [Header("Village Variables")]
     [SerializeField]
-    [Range(2, 600)]
+    [Range(2, 200)]
     private int noOfHouses = 10;
-
-    [SerializeField]
-    [Range(1, 100)]
-    private int percentHousesOnRoad = 15;
 
     [SerializeField]
     [Range(0.1f, 1)]
@@ -117,7 +75,126 @@ public class HousePlacer : MonoBehaviour
 
     }*/
 
-    private void SpaceHouses()
+
+    public void PlaceTaverns(List<RoadDetails> roadList)
+    {
+
+        List<TurtleTransform> validTransforms = new List<TurtleTransform>();
+
+        //generate number of taverns
+        int roadCount = roadList.Count;
+        int tavernCount = 0;
+        if (roadCount > 0 && roadCount <= 20)
+        {
+            tavernCount = 1;
+        }
+        else if (roadCount > 20 && roadCount <= 80)
+        {
+            tavernCount = 2;
+        }
+        else if (roadCount > 80 && roadCount <= 100)
+        {
+            tavernCount = 3;
+        }
+        else if (roadCount > 100)
+        {
+            tavernCount = 4;
+        }
+
+
+        //calculate the distance the tavern should be placed from the road.
+        float distanceFromRoad = houseSeparation + (tavern.transform.localScale.z * (tavern.GetComponent<BoxCollider>().size.z / 2));
+
+        //for each road in roadlist, need to check if there is a space on either side of road
+        foreach (RoadDetails road in roadList)
+        {
+
+            //get location where cube needs to be placed.
+            Vector3 perpVector = Vector3.Cross(road.GetDirection(), Vector3.up).normalized;
+
+            for (int i = 0; i < 2; i++)
+            {
+                //flip perp Vector to get both sides
+                perpVector = -perpVector;
+
+                //set transform to side of road
+                turtle.transform.position = road.GetCentrepoint() + ((road.GetRoadWidth() / 2) + distanceFromRoad) * perpVector;
+                //set rotation to be perpendicular to road
+                turtle.transform.LookAt(road.GetCentrepoint());
+
+                //if there is space, add position to list, and add rotation so tavern faces towards road. use turtletransform
+                if (CheckIfLocationEmpty(turtle.transform.position, turtle.transform.rotation))
+                {
+                    validTransforms.Add(new TurtleTransform(turtle.transform.position, turtle.transform.rotation));
+                }
+
+            }
+
+        }
+
+        foreach (Transform child in this.transform)
+        {
+            if (child.CompareTag("BoundsChecker"))
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        Debug.Log("Valid Tavern Positions:" + validTransforms.Count);
+
+        //randomly pick tavern spots from list based on number of taverns
+        //to ensure that all the taverns can be placed.
+        if (tavernCount > validTransforms.Count)
+        {
+            tavernCount = validTransforms.Count;
+        }
+        
+        //for each tavern
+        for (int i = 0; i < tavernCount; i++)
+        {
+            //pick random object from valid position list
+            int random = Random.Range(0, validTransforms.Count);
+            //place tavern at that position
+            TurtleTransform tempTransform = validTransforms[random];
+            Instantiate(tavern, tempTransform.GetPosition(), tempTransform.GetRotation(), this.transform);
+            //remove position from list
+            validTransforms.RemoveAt(random);
+
+        }
+
+    }
+
+    //returns true if the location is empty
+    private bool CheckIfLocationEmpty(Vector3 position, Quaternion rotation)
+    {
+        bool spaceEmpty = false;
+
+        //this doesn't really fully work but it does the job
+        Collider[] tempColliders = Physics.OverlapBox(position, new Vector3 (0.9f, 0.4f, 0.4f), rotation);
+
+        if (tempColliders.Length == 0)
+        {
+            spaceEmpty = true;
+            GameObject bounds = Instantiate(boundsChecker, position, rotation, this.transform);
+            bounds.name = "Valid Position";
+        }
+        else
+        {
+            GameObject bounds = Instantiate(boundsChecker, position, rotation, this.transform);
+            bounds.name = "Invalid Position";
+
+            foreach (Collider collider in tempColliders)
+            {
+                Debug.Log(collider.gameObject.name);
+            }
+
+        }
+
+        //Destroy(bounds);
+        return spaceEmpty;
+    }
+
+    public void SpaceHouses()
     {
         //spread out position of houses
         //counter used to stop loop if it is running too many times
@@ -153,23 +230,7 @@ public class HousePlacer : MonoBehaviour
                             }
                         }
                     }
-                    //if the house is too close to the road, move it to a set distance away.
-                    if (comparisonHouse.GetPosition().z < Road.transform.position.z + 1 && comparisonHouse.GetPosition().z > Road.transform.position.z - 1)
-                    {
 
-                        //calculate how far the house needs to move to be the correct distance away from the road
-                        float zOffset = (1 + houseSeparation) - Mathf.Abs((Road.transform.position.z - comparisonHouse.GetPosition().z));
-
-                        //flip the offset if necessary
-                        if (comparisonHouse.GetPosition().z - Road.transform.position.z < 0)
-                        {
-                            zOffset *= -1;
-                        }
-
-
-                        //move the house to the new position
-                        comparisonHouse.MoveHouse(Vector3.forward * zOffset);
-                    }
                 }
 
             }
@@ -179,7 +240,7 @@ public class HousePlacer : MonoBehaviour
     private void CreateHouse(bool houseType, int i, Vector3 position)
     {
         GameObject house;
-        house = Instantiate(housePrefab, position, Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0)), gameObject.transform);
+        house = Instantiate(housePrefabs[0], position, Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0)), gameObject.transform);
         //if housetype is true, it is a regular house
         house.transform.localScale = CreateRandomScale(houseType);
         //bump house position up to account for random scale (so it doesnt go through the floor)
@@ -187,23 +248,7 @@ public class HousePlacer : MonoBehaviour
         houseArray[i] = new House(house);
     }
 
-    private Vector3 CreateRoadLocation()
-    {
-        //set the house to a random position along the middle of the road
-        Vector3 position = new Vector3(Random.Range(-areaRange, areaRange), 0, Road.transform.position.z);
 
-        //push the house to a random side of the road.
-        if (Random.Range(0, 2) == 0)
-        {
-            position += Vector3.forward * (1 + houseSeparation);
-        }
-        else
-        {
-            position += Vector3.back * (1 + houseSeparation);
-        }
-
-        return position;
-    }
 
     private Vector3 CreateRandomLocation()
     {

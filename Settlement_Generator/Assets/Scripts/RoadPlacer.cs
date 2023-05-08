@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,25 +27,23 @@ public class RoadPlacer : MonoBehaviour
 
     private Stack<TurtleTransform> turtleTransforms = new Stack<TurtleTransform>();
     private List<TurtleTransform> roadJuctionTransforms = new List<TurtleTransform>();
+    private List<RoadDetails> roadList = new List<RoadDetails>();
 
     private int depth = -1;
     private string sentence;
 
-    private void Start()
+    public List<RoadDetails> CreateRoadSystem()
     {
-        CreateRoadSystem();
-    }
 
-    public void CreateRoadSystem()
-    {
         sentence = lSystem.GenerateSentence();
-        Debug.Log(sentence);
         PlaceRoads(sentence);
 
         foreach (TurtleTransform junction in roadJuctionTransforms)
         {
             Instantiate(junctionPrefab, junction.GetPosition(), junction.GetRotation(), this.transform);
         }
+
+        return roadList;
 
     }
 
@@ -85,11 +82,16 @@ public class RoadPlacer : MonoBehaviour
                     break;
                 case Encoding.road:
                 case Encoding.endRoad:
-                    //place road at current position and rotation of turtle
-                    road = Instantiate(roadPrefab, turtle.transform.position, turtle.transform.rotation, this.transform);
-                    road.transform.localScale = new Vector3(1, 1, 1 * Mathf.Pow(roadScaling, depth));
-                    //update position of turtle to end of road. (note, rotation does not need to be updated)
-                    turtle.transform.position = road.transform.Find("Connector").transform.position;
+                    if (depth < 6)
+                    {
+                        //place road at current position and rotation of turtle
+                        road = Instantiate(roadPrefab, turtle.transform.position, turtle.transform.rotation, this.transform);
+                        road.transform.localScale = new Vector3(1, 1, 1 * Mathf.Pow(roadScaling, depth));
+                        roadList.Add(new RoadDetails(road.transform.rotation, road.transform.Find("CentrePoint").transform.position, road.transform.GetChild(0).transform.localScale.z));
+                        //update position of turtle to end of road. (note, rotation does not need to be updated)
+                        turtle.transform.position = road.transform.Find("Connector").transform.position;
+                    }
+
                     break;
                 case Encoding.right:
                     //rotate turtle to the right. can implement random angles later by using angleVariance
