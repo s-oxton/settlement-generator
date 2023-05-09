@@ -556,11 +556,11 @@ MonoBehaviour:
   tavern: {fileID: 7590649277002926812, guid: 51bbfc0cabd685944b12d5dc2a0380b8, type: 3}
   turtle: {fileID: 368076921}
   boundsChecker: {fileID: 7457800808667483594, guid: 18af8b8af6149cd419b0fdb43eda45f9, type: 3}
-  noOfHouses: 100
-  houseSeparation: 0.193
-  areaRange: 14
-  houseMoveDistance: 0.3
-  spacingIterations: 27
+  noOfHouses: 61
+  houseSeparation: 0.1
+  roadSpacing: 1
+  houseMoveDistance: 0.24
+  spacingIterations: 99
 --- !u!4 &760844162
 Transform:
   m_ObjectHideFlags: 0

@@ -174,7 +174,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2191476636215356620}
   m_Layer: 0
-  m_Name: CarvedPost2
+  m_Name: CarvedPost1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -187,14 +187,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2189780586911559896}
-  m_LocalRotation: {x: 0, y: -0.92387956, z: 0, w: 0.38268343}
-  m_LocalPosition: {x: 0.3, y: -0, z: -0.3}
-  m_LocalScale: {x: 0.19779071, y: 0.19779071, z: 0.19779071}
+  m_LocalRotation: {x: -0, y: -0.9238795, z: -0, w: -0.38268346}
+  m_LocalPosition: {x: 0.49999997, y: -0.21428573, z: 0.50000006}
+  m_LocalScale: {x: 0.32965115, y: 2.8255818, z: 0.32965115}
   m_Children:
   - {fileID: 2195059713155232830}
   - {fileID: 2195187764716200234}
   - {fileID: 2191081574844699814}
-  m_Father: {fileID: 5014381454163840756}
+  m_Father: {fileID: 4161269417698018849}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -135, z: 0}
 --- !u!1 &2189813707432857074
@@ -289,7 +289,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7493732620687312406}
   m_Layer: 0
-  m_Name: CarvedPost2 (1)
+  m_Name: CarvedPost2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -302,15 +302,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2795646028375790524}
-  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: -0.3, y: -0, z: 0.3}
-  m_LocalScale: {x: 0.19779071, y: 0.19779071, z: 0.19779071}
+  m_LocalRotation: {x: -0, y: -0.38268346, z: -0, w: 0.9238795}
+  m_LocalPosition: {x: -0.49999997, y: -0.21428573, z: -0.50000006}
+  m_LocalScale: {x: 0.32965115, y: 2.8255818, z: 0.32965115}
   m_Children:
   - {fileID: 1020687658090787425}
   - {fileID: 5138749989666792009}
   - {fileID: 8321142113798002929}
-  m_Father: {fileID: 5014381454163840756}
-  m_RootOrder: 2
+  m_Father: {fileID: 4161269417698018849}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
 --- !u!1 &3748573262296684018
 GameObject:
@@ -490,7 +490,7 @@ GameObject:
   - component: {fileID: 4161269417698018852}
   m_Layer: 0
   m_Name: RoadMesh
-  m_TagString: Untagged
+  m_TagString: Road
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -503,11 +503,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4161269417698018853}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.035, z: 0}
   m_LocalScale: {x: 0.6, y: 0.07, z: 0.6}
-  m_Children: []
+  m_Children:
+  - {fileID: 2191476636215356620}
+  - {fileID: 7493732620687312406}
   m_Father: {fileID: 5014381454163840756}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!33 &4161269417698018854
 MeshFilter:
@@ -665,7 +667,7 @@ GameObject:
   - component: {fileID: 5014381454163840756}
   m_Layer: 0
   m_Name: JunctionPrefab
-  m_TagString: Untagged
+  m_TagString: Immovable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -678,12 +680,41 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6785733408643841553}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.1800885, y: 0.0000009536743, z: -0.117330074}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 2191476636215356620}
   - {fileID: 4161269417698018849}
-  - {fileID: 7493732620687312406}
+  - {fileID: 2298191215655419808}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7426506606059749322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2298191215655419808}
+  m_Layer: 0
+  m_Name: CentrePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2298191215655419808
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7426506606059749322}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5014381454163840756}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

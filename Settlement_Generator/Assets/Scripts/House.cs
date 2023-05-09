@@ -18,13 +18,12 @@ public class House
 
     public Vector3 GetPosition()
     {
-        Vector3 location;
+        return house.transform.position;
+    }
 
-        location = house.transform.position;
-
-        location = new Vector3(location.x, 0, location.z);
-
-        return location;
+    public Quaternion GetRotation()
+    {
+        return house.transform.rotation;
     }
 
     public void SetPosition(Vector3 newPosition)
@@ -36,11 +35,5 @@ public class House
     {
         return house.GetComponent<Collider>();
     }
-
-    public void MoveHouse(Vector3 movement)
-    {
-        house.transform.position = house.transform.position + movement;
-    }
-
 
 }

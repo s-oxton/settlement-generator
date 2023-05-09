@@ -24,57 +24,23 @@ public class HousePlacer : MonoBehaviour
     private int noOfHouses = 10;
 
     [SerializeField]
-    [Range(0.1f, 1)]
+    [Range(0.1f, 5)]
     private float houseSeparation = 0.3f;
 
     [SerializeField]
-    private float areaRange = 5;
+    [Range(0.1f, 10f)]
+    private float roadSpacing = 1f;
 
     [Header("Algorithm Variables")]
     [SerializeField]
+    [Range(0.1f, 2f)]
     private float houseMoveDistance = 0.1f;
 
     [SerializeField]
-    [Range(0, 100)]
+    [Range(0, 500)]
     private int spacingIterations = 25;
 
     private House[] houseArray;
-
-    // Start is called before the first frame update
-    /*void Start()
-    {
-
-        houseArray = new House[noOfHouses];
-        int noOfTaverns = Random.Range(0, 2);
-        if (noOfHouses >= 100)
-        {
-            noOfTaverns = noOfTaverns + Mathf.FloorToInt(noOfHouses / 200);
-        }
-
-        //make a percentage of the houses stick to the road
-        int noOfRoadHouses = Mathf.FloorToInt(noOfHouses * (percentHousesOnRoad/100f));
-
-        Vector3 housePosition;
-
-        //randomly place houses
-        for (int i = 0; i < noOfHouses; i++)
-        {
-            //place the first amount of houses on the road
-            if (i < noOfRoadHouses)
-            {
-                housePosition = CreateRoadLocation();
-            }
-            else
-            {
-                housePosition = CreateRandomLocation();
-            }
-
-        }
-
-        SpaceHouses();
-
-    }*/
-
 
     public void PlaceTaverns(List<RoadDetails> roadList)
     {
@@ -140,15 +106,13 @@ public class HousePlacer : MonoBehaviour
             }
         }
 
-        Debug.Log("Valid Tavern Positions:" + validTransforms.Count);
-
         //randomly pick tavern spots from list based on number of taverns
         //to ensure that all the taverns can be placed.
         if (tavernCount > validTransforms.Count)
         {
             tavernCount = validTransforms.Count;
         }
-        
+
         //for each tavern
         for (int i = 0; i < tavernCount; i++)
         {
@@ -170,127 +134,138 @@ public class HousePlacer : MonoBehaviour
         bool spaceEmpty = false;
 
         //this doesn't really fully work but it does the job
-        Collider[] tempColliders = Physics.OverlapBox(position, new Vector3 (0.9f, 0.4f, 0.4f), rotation);
+        Collider[] tempColliders = Physics.OverlapBox(position, new Vector3(0.9f, 0.4f, 0.4f), rotation);
 
         if (tempColliders.Length == 0)
         {
             spaceEmpty = true;
             GameObject bounds = Instantiate(boundsChecker, position, rotation, this.transform);
-            bounds.name = "Valid Position";
-        }
-        else
-        {
-            GameObject bounds = Instantiate(boundsChecker, position, rotation, this.transform);
-            bounds.name = "Invalid Position";
-
-            foreach (Collider collider in tempColliders)
-            {
-                Debug.Log(collider.gameObject.name);
-            }
-
         }
 
         //Destroy(bounds);
         return spaceEmpty;
     }
 
+    public void PlaceHouses(Vector3[] roadBounds)
+    {
+        houseArray = new House[noOfHouses];
+
+        for (int i = 0; i < noOfHouses; i++)
+        {
+            //place a house
+            Vector3 position = CreateRandomLocation(roadBounds);
+            int prefabNumber = Random.Range(0, housePrefabs.Length);
+            GameObject house = Instantiate(housePrefabs[prefabNumber], position, Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0)), gameObject.transform);
+            houseArray[i] = new House(house);
+        }
+    }
+
     public void SpaceHouses()
     {
+
         //spread out position of houses
         //counter used to stop loop if it is running too many times
         for (int i = 0; i < spacingIterations; i++)
         {
-
+            int overlapCount = 0;
             foreach (House house in houseArray)
             {
-                //loop through all the other houses
-                foreach (House comparisonHouse in houseArray)
+
+                //if house too far away from road, move towards centre
+                Collider[] colliders = Physics.OverlapSphere(house.GetPosition(), roadSpacing);
+
+                bool moveToRoad = true;
+                foreach (Collider collider in colliders)
                 {
-                    if (house != comparisonHouse)
+                    //if tag is road, movetoroad = false
+                    if (collider.gameObject.tag.Equals("Road"))
                     {
-                        //only do intensive collider checking if houses are close enough for it to matter.
-                        if (Vector3.Distance(house.GetPosition(), comparisonHouse.GetPosition()) < 2f)
+                        moveToRoad = false;
+                        break;
+                    }
+                }
+
+                if (moveToRoad)
+                {
+                    //movetowards 0,0,0
+                    Vector3 direction = (Vector3.zero - house.GetPosition()).normalized;
+                    //house.SetPosition(house.GetPosition() + direction * (houseMoveDistance / 2));
+                }
+
+                //get all the nearby objects 
+                colliders = Physics.OverlapBox(house.GetPosition(), (Vector3.one * houseSeparation) + (house.GetCollider().bounds.size), house.GetRotation());
+
+                foreach (Collider collider in colliders)
+                {
+                    //if the collider isn't the collider of the current house
+                    if (collider != house.GetCollider())
+                    {
+                        //find the closest points between the house and the nearby object
+                        Vector3 closestPoint = collider.ClosestPoint(house.GetPosition());
+                        Vector3 currentHouseClosestPoint = house.GetCollider().ClosestPoint(closestPoint);
+
+                        float distance = Vector3.Distance(closestPoint, currentHouseClosestPoint);
+
+                        //if these points are the same the house is overlapping
+                        if (closestPoint == currentHouseClosestPoint)
                         {
-                            //find the distance between the houses
-                            //get the closest points on each house's collider
-                            Vector3 comparisonHouseClosestPoint = comparisonHouse.GetCollider().ClosestPoint(house.GetPosition());
-                            Vector3 currentHouseClosestPoint = house.GetCollider().ClosestPoint(comparisonHouseClosestPoint);
+                            overlapCount++;
+                        }
+                        //if distance too small, object needs to be moved
+                        if (distance < houseSeparation || closestPoint == currentHouseClosestPoint)
+                        {
 
-                            float distance = Vector3.Distance(comparisonHouseClosestPoint, currentHouseClosestPoint);
+                            Vector3 otherPosition = new Vector3();
 
-                            //if the houses are too close, move the comparison house
-                            if (distance < houseSeparation)
+                            //if object is a road, need to get the Centrepoint from the prefab
+                            if (collider.gameObject.tag.Equals("Road"))
                             {
-                                //get direction between the two houses
-                                Vector3 direction = -(house.GetPosition() - comparisonHouse.GetPosition()).normalized;
-                                //Debug.DrawRay(comparisonHouse.GetPosition(), direction, Color.green, Time.deltaTime);
-                                //move the other house 
-                                direction = new Vector3(direction.x, 0f, direction.z);
-                                comparisonHouse.MoveHouse(direction * houseMoveDistance);
+                                otherPosition = collider.gameObject.transform.parent.gameObject.transform.Find("CentrePoint").transform.position;
+                            }
+                            else
+                            {
+                                otherPosition = collider.gameObject.transform.position;
+                            }
+
+                            //get direction from house to other position
+                            Vector3 direction = (otherPosition - house.GetPosition()).normalized;
+
+                            //if other object is immovable (i.e. a road), move current house AWAY from object
+                            if (collider.gameObject.tag.Equals("Immovable") || collider.gameObject.tag.Equals("Road"))
+                            {
+                                house.SetPosition(house.GetPosition() + -direction * houseMoveDistance);
+                            }
+                            // else move other object away from house
+                            else
+                            {
+                                collider.gameObject.transform.position = otherPosition + direction * houseMoveDistance;
                             }
                         }
                     }
-
                 }
-
             }
+
+            Debug.Log("Iteration "+i+". Overlap count " + overlapCount);
+
         }
     }
 
-    private void CreateHouse(bool houseType, int i, Vector3 position)
+    private float GetMaxElement(Vector3 bounds)
     {
-        GameObject house;
-        house = Instantiate(housePrefabs[0], position, Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0)), gameObject.transform);
-        //if housetype is true, it is a regular house
-        house.transform.localScale = CreateRandomScale(houseType);
-        //bump house position up to account for random scale (so it doesnt go through the floor)
-        house.transform.position += CalculateOffset(house);
-        houseArray[i] = new House(house);
+        float maxValue = 0f;
+
+        maxValue = Mathf.Max(bounds.x, bounds.y, bounds.z);
+
+        return maxValue;
     }
 
-
-
-    private Vector3 CreateRandomLocation()
+    private Vector3 CreateRandomLocation(Vector3[] roadBounds)
     {
-        float areaScaling = 1;
-        //change the range a house can be placed in
-        float scaledArea = areaRange / areaScaling;
         //initialise location
-        float x = Random.Range(-scaledArea, scaledArea);
-        float z = Random.Range(-scaledArea, scaledArea);
+        float x = Random.Range(roadBounds[0].x, roadBounds[1].x);
+        float z = Random.Range(roadBounds[0].z, roadBounds[1].z);
 
-        Vector3 location = new Vector3(x, 0, z);
-        return location;
-    }
-
-    private Vector3 CreateRandomScale(bool houseType)
-    {
-        float xScale = 0.5f, yScale = 0.5f, zScale = 0.5f;
-        //if scaling a house.
-        if (houseType)
-        {
-            xScale = Random.Range(0.4f, 0.75f);
-            zScale = Random.Range(0.5f, 0.75f);
-        }
-        //if scaling a tavern.
-        else
-        {
-            xScale = Random.Range(1f, 3f);
-            //adds 1 or 2 floors to the tavern.
-            yScale *= Random.Range(2, 4);
-            zScale = Random.Range(1f, 3f);
-        }
-
-        Vector3 scale = new Vector3(xScale, yScale, zScale);
-        return scale;
-    }
-
-    private Vector3 CalculateOffset(GameObject house)
-    {
-        //half house starts in the floor, so needs to be moved up by half of the scale.
-        float scale = house.transform.localScale.y;
-        float offset = scale / 2;
-        return Vector3.up * offset;
+        return new Vector3(x, 0, z);
     }
 
 }
