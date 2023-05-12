@@ -10,6 +10,21 @@ public class SettlementGenerator : MonoBehaviour
     [SerializeField]
     private HousePlacer housePlacer;
 
+    [Header("Program Variables")]
+    [SerializeField]
+    [Range(0,6)]
+    private int lSystemIterations = 1;
+
+    [SerializeField]
+    [Range(0,200)]
+    private int numberOfHouses = 10;
+
+    [SerializeField]
+    private bool placeHouses;
+
+    [SerializeField]
+    private bool RoadHousePlacement;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,21 +32,42 @@ public class SettlementGenerator : MonoBehaviour
         Vector3[] roadBounds;
 
         //place roads
-        roadList = roadPlacer.CreateRoadSystem();
+        roadList = roadPlacer.CreateRoadSystem(lSystemIterations);
 
         //find max and min x and z values of road
-        roadBounds = GetRoadBounds(roadList);
+        if (roadList.Count > 0)
+        {
+            roadBounds = GetRoadBounds(roadList);
+        }
+        else
+        {
+            roadBounds = new Vector3[] { Vector3.zero, Vector3.zero };
+        }
 
-        //place big houses on road
-        housePlacer.PlaceTaverns(roadList);
+        if (placeHouses)
+        {
+            //place big houses on road
+            housePlacer.PlaceTaverns(roadList);
 
-        //place small houses/trees randomly
-        housePlacer.PlaceHouses(roadBounds);
+            housePlacer.InitialiseHouseList(numberOfHouses);
 
-        //spread out small houses/trees
-        housePlacer.SpaceHouses();
+            //making the houses only place next to a road.
+            if (RoadHousePlacement)
+            {
 
-        //make any house close to the road face the road
+            }
+            //place houses randomly
+            else
+            {
+                //place small houses randomly
+                housePlacer.PlaceHousesRandomly(roadBounds);
+
+                //spread out small houses
+                housePlacer.ActivateSpacingMethod();
+            }
+        }
+
+
 
     }
 

@@ -32,10 +32,10 @@ public class RoadPlacer : MonoBehaviour
     private int depth = -1;
     private string sentence;
 
-    public List<RoadDetails> CreateRoadSystem()
+    public List<RoadDetails> CreateRoadSystem(int iterations)
     {
 
-        sentence = lSystem.GenerateSentence();
+        sentence = lSystem.GenerateSentence(iterations);
         PlaceRoads(sentence);
 
         foreach (TurtleTransform junction in roadJuctionTransforms)
@@ -87,7 +87,7 @@ public class RoadPlacer : MonoBehaviour
                         //place road at current position and rotation of turtle
                         road = Instantiate(roadPrefab, turtle.transform.position, turtle.transform.rotation, this.transform);
                         road.transform.localScale = new Vector3(1, 1, 1 * Mathf.Pow(roadScaling, depth));
-                        roadList.Add(new RoadDetails(road.transform.rotation, road.transform.Find("CentrePoint").transform.position, road.transform.GetChild(0).transform.localScale.z));
+                        roadList.Add(new RoadDetails(road.transform.rotation, road.transform.Find("CentrePoint").transform.position, road.transform.GetChild(0).transform.localScale.x));
                         //update position of turtle to end of road. (note, rotation does not need to be updated)
                         turtle.transform.position = road.transform.Find("Connector").transform.position;
                     }

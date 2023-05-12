@@ -8,12 +8,9 @@ public class LSystem : MonoBehaviour
     [SerializeField]
     private string[] axioms;
     [SerializeField]
-    [Range(0, 8)]
-    private int iterations;
-    [SerializeField]
     private Rule[] rules;
 
-    public string GenerateSentence()
+    public string GenerateSentence(int iterations)
     {
 
         string sentence = axioms[Random.Range(0, axioms.Length)];
