@@ -555,11 +555,10 @@ MonoBehaviour:
   tavern: {fileID: 7590649277002926812, guid: 51bbfc0cabd685944b12d5dc2a0380b8, type: 3}
   turtle: {fileID: 368076921}
   boundsChecker: {fileID: 7457800808667483594, guid: 18af8b8af6149cd419b0fdb43eda45f9, type: 3}
-  noOfHouses: 40
   houseSeparation: 0.1
   roadSpacing: 1
   houseMoveDistance: 0.5
-  spacingIterations: 1999
+  spacingIterations: 800
   locationScaling: 0.798
 --- !u!4 &760844162
 Transform:
@@ -624,6 +623,6 @@ MonoBehaviour:
   roadPlacer: {fileID: 45783959}
   housePlacer: {fileID: 760844161}
   lSystemIterations: 2
-  numberOfHouses: 10
+  numberOfHouses: 40
   placeHouses: 1
-  RoadHousePlacement: 0
+  housePlacementRatio: 0.7

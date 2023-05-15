@@ -12,18 +12,19 @@ public class SettlementGenerator : MonoBehaviour
 
     [Header("Program Variables")]
     [SerializeField]
-    [Range(0,6)]
+    [Range(0, 6)]
     private int lSystemIterations = 1;
 
     [SerializeField]
-    [Range(0,200)]
+    [Range(0, 200)]
     private int numberOfHouses = 10;
 
     [SerializeField]
     private bool placeHouses;
 
     [SerializeField]
-    private bool RoadHousePlacement;
+    [Range(0f, 1f)]
+    private float housePlacementRatio = 0.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -46,25 +47,35 @@ public class SettlementGenerator : MonoBehaviour
 
         if (placeHouses)
         {
-            //place big houses on road
+            //place taverns on road
             housePlacer.PlaceTaverns(roadList);
 
             housePlacer.InitialiseHouseList(numberOfHouses);
 
-            //making the houses only place next to a road.
-            if (RoadHousePlacement)
-            {
+            int housesOnRoad = Mathf.RoundToInt(Mathf.Lerp(0, numberOfHouses, housePlacementRatio));
+            int failedHouses = 0;
+            Debug.Log(housesOnRoad);
 
+            if (housesOnRoad > 0)
+            {
+                //find places where the houses can go on the road
+                List<TurtleTransform> houseLocations = housePlacer.FindHouseLocations(roadList);
+
+                if (housesOnRoad > houseLocations.Count)
+                {
+                    housesOnRoad = houseLocations.Count;
+                }
+
+                //place a certain number of houses on the road
+                failedHouses = housePlacer.PlaceHousesOnRoad(housesOnRoad, houseLocations);
             }
+
             //place houses randomly
-            else
-            {
-                //place small houses randomly
-                housePlacer.PlaceHousesRandomly(roadBounds);
+            housePlacer.PlaceHousesRandomly(numberOfHouses - (housesOnRoad - failedHouses), roadBounds);
 
-                //spread out small houses
-                housePlacer.ActivateSpacingMethod();
-            }
+            //spread out houses
+            housePlacer.ActivateSpacingMethod();
+
         }
 
 

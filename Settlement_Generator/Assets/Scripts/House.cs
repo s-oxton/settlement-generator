@@ -31,6 +31,11 @@ public class House
         house.transform.position = newPosition;
     }
 
+    public void SetRotation(Quaternion rotation)
+    {
+        house.transform.rotation = rotation;
+    }
+
     public Collider GetCollider()
     {
         return house.GetComponent<Collider>();

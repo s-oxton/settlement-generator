@@ -72,7 +72,7 @@ public class HousePlacer : MonoBehaviour
                 turtle.transform.LookAt(road.GetCentrepoint());
 
                 //if there is space, add position to list, and add rotation so tavern faces towards road. use turtletransform
-                if (CheckIfLocationEmpty(boundsChecker.transform.localScale, turtle.transform.position, turtle.transform.rotation))
+                if (CheckIfLocationEmpty(boundsChecker.transform.localScale, turtle.transform.position, turtle.transform.rotation, true))
                 {
                     validTransforms.Add(new TurtleTransform(turtle.transform.position, turtle.transform.rotation));
                 }
@@ -130,18 +130,155 @@ public class HousePlacer : MonoBehaviour
         return tavernCount;
     }
 
+    //find a list of all the possible places a house could be put alongside a road
+    public List<TurtleTransform> FindHouseLocations(List<RoadDetails> roadList)
+    {
+
+        List<TurtleTransform> houseLocations = new List<TurtleTransform>();
+
+        Vector3 scale = CalculateMaxHouseScale();
+
+        Debug.Log(scale);
+
+        foreach (RoadDetails road in roadList)
+        {
+
+            Vector3 perpVector = Vector3.Cross(road.GetDirection(), Vector3.up).normalized;
+
+            //calculate how many houses can fit on the road
+            int numberOfHouses = Mathf.FloorToInt((road.GetRoadLength() - scale.x) / scale.x);
+
+            //make it so every road has a house C:
+            //apart from houses with a NEGATIVE number of houses they suck
+            if (numberOfHouses == 0)
+            {
+                numberOfHouses = 1;
+            }
+
+            //if houses can actually go on the road
+            if (numberOfHouses > 0)
+            {
+                //calculate how far each house is spread out
+                //need to -scale.x to account for the houses being placed in the centre of the location
+                float houseSpacing = (road.GetRoadLength() - scale.x) / numberOfHouses;
+
+                for (int i = 1; i <= numberOfHouses; i++)
+                {
+                    Vector3 roadCentreLocation;
+
+                    //get the position in the centre of the road
+                    if (numberOfHouses == 1)
+                    {
+                        roadCentreLocation = road.GetCentrepoint();
+                    }
+                    else
+                    {
+                        roadCentreLocation = road.GetPosition() + road.GetDirection() * houseSpacing * i;
+                    }
+
+                    //set a location on either side of the road
+                    for (int j = 0; j < 2; j++)
+                    {
+                        //flip perp Vector to get both sides
+                        perpVector = -perpVector;
+
+                        //set transform to side of road
+                        turtle.transform.position = roadCentreLocation + ((road.GetRoadWidth() / 2) + (houseSeparation + scale.z / 2)) * perpVector;
+                        //set rotation to be perpendicular to road
+                        turtle.transform.LookAt(roadCentreLocation);
+
+                        //add location to list.
+                        houseLocations.Add(new TurtleTransform(turtle.transform.position, turtle.transform.rotation));
+
+                    }
+                }
+            }
+        }
+
+        return houseLocations;
+    }
+
+    //creates a generic scale by using the biggest scale from each of the prefabs
+    private Vector3 CalculateMaxHouseScale()
+    {
+
+        float x = 0, y = 0, z = 0;
+
+        foreach (GameObject prefab in housePrefabs)
+        {
+
+            //initialise the prefab to be able to get the bounds
+            GameObject tempPrefab = Instantiate(prefab);
+
+            float tempX = tempPrefab.transform.GetComponent<BoxCollider>().bounds.size.x;
+            float tempY = tempPrefab.transform.GetComponent<BoxCollider>().bounds.size.y;
+            float tempZ = tempPrefab.transform.GetComponent<BoxCollider>().bounds.size.z;
+
+            //remove prefab after.
+            Destroy(tempPrefab);
+
+            if (tempX > x)
+            {
+                x = tempX;
+            }
+
+            if (tempY > y)
+            {
+                y = tempY;
+            }
+
+            if (tempZ > z)
+            {
+                z = tempZ;
+            }
+
+
+        }
+
+        return new Vector3(x, y, z);
+    }
+
+    public int PlaceHousesOnRoad(int numberOfHouses, List<TurtleTransform> houseLocations)
+    {
+        //for each house that needs to be placed
+        for (int i = 0; i < numberOfHouses; i++)
+        {
+            //check if there is a valid location left
+            if (houseLocations.Count > 0)
+            {
+                int randomLocation = Random.Range(0, houseLocations.Count);
+
+                houseList[i].SetPosition(houseLocations[randomLocation].GetPosition());
+                houseList[i].SetRotation(houseLocations[randomLocation].GetRotation());
+
+                houseLocations.RemoveAt(randomLocation);
+
+            }
+            //if there's no houses, need to return how many houses DID NOT get placed
+            else
+            {
+                return i;
+            }
+        }
+        return 0;
+
+    }
+
     //returns true if the location is empty
-    private bool CheckIfLocationEmpty(Vector3 scale, Vector3 position, Quaternion rotation)
+    private bool CheckIfLocationEmpty(Vector3 scale, Vector3 position, Quaternion rotation, bool tavernCheck)
     {
         bool spaceEmpty = false;
 
         //this doesn't really fully work but it does the job new Vector3(0.9f, 0.4f, 0.4f)
-        Collider[] tempColliders = Physics.OverlapBox(position, (scale + Vector3.one * houseSeparation) / 2, rotation);
+        Collider[] tempColliders = Physics.OverlapBox(position, ((scale + Vector3.one * houseSeparation) * 0.8f) / 2, rotation);
 
         if (tempColliders.Length == 0)
         {
             spaceEmpty = true;
-            GameObject bounds = Instantiate(boundsChecker, position, rotation, this.transform);
+            if (tavernCheck)
+            {
+                GameObject bounds = Instantiate(boundsChecker, position, rotation, this.transform);
+            }
         }
 
         //Destroy(bounds);
@@ -154,19 +291,20 @@ public class HousePlacer : MonoBehaviour
         for (int i = 0; i < noOfHouses; i++)
         {
             int prefabNumber = Random.Range(0, housePrefabs.Length);
-            GameObject house = Instantiate(housePrefabs[prefabNumber], this.transform.position + (Vector3.down*5), this.transform.rotation, gameObject.transform);
+            GameObject house = Instantiate(housePrefabs[prefabNumber], this.transform.position + (Vector3.down * 5), this.transform.rotation, gameObject.transform);
             houseList.Add(new House(house));
         }
 
     }
 
-    public void PlaceHousesRandomly(Vector3[] roadBounds)
+    public void PlaceHousesRandomly(int numberOfHouses, Vector3[] roadBounds)
     {
-        foreach (House house in houseList) { 
-             
-            house.SetPosition(CreateRandomLocation(roadBounds));
-
+        int listOffset = houseList.Count - numberOfHouses;
+        for (int i = 0; i < numberOfHouses; i++)
+        {
+            houseList[i + listOffset].SetPosition(CreateRandomLocation(roadBounds));
         }
+
     }
 
     private bool spaceHouses = false;
@@ -203,6 +341,7 @@ public class HousePlacer : MonoBehaviour
                         Vector3 otherPosition = collider.gameObject.transform.position;
                         //find the direction between the two things
                         Vector3 direction = (house.GetPosition() - otherPosition).normalized;
+                        direction = SetZeroY(direction);
                         //move house
                         house.SetPosition(house.GetPosition() + direction * houseMoveDistance * Time.fixedDeltaTime);
                         //if other object not immovable, move it as well. This stops houses getting stuck in between multiple houses.
@@ -217,6 +356,8 @@ public class HousePlacer : MonoBehaviour
                     {
                         //direction between road and house
                         Vector3 directionOfHouse = (house.GetPosition() - collider.gameObject.transform.parent.position).normalized;
+
+                        directionOfHouse = SetZeroY(directionOfHouse);
                         //direction is -1 for left side, +1 when right side
                         float sideOfRoad = CalculateDirection(collider.gameObject.transform.parent.forward, directionOfHouse, collider.gameObject.transform.parent.up);
                         //update house position. if on right side, side of road = 1 so transform.right is not flipped, otherwise it is flipped to the left side.
@@ -247,6 +388,11 @@ public class HousePlacer : MonoBehaviour
 
         }
 
+    }
+
+    private Vector3 SetZeroY(Vector3 oldVector)
+    {
+        return new Vector3(oldVector.x, 0, oldVector.z);
     }
 
     private void FixedUpdate()
@@ -304,8 +450,8 @@ public class HousePlacer : MonoBehaviour
     private Vector3 CreateRandomLocation(Vector3[] roadBounds)
     {
         //initialise location
-        float x = Random.Range(roadBounds[0].x, roadBounds[1].x) * locationScaling;
-        float z = Random.Range(roadBounds[0].z, roadBounds[1].z) * locationScaling;
+        float x = Random.Range(roadBounds[0].x, roadBounds[1].x);
+        float z = Random.Range(roadBounds[0].z, roadBounds[1].z);
 
         return new Vector3(x, 0, z);
     }

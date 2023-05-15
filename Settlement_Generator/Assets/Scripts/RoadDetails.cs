@@ -3,32 +3,41 @@ using UnityEngine;
 public class RoadDetails
 {
 
-    private Vector3 roadDirection;
+    GameObject road;
 
-    private Vector3 roadCentrePoint;
-
-    private float roadWidth;
-
-    public RoadDetails( Quaternion rotation, Vector3 centrePoint, float width)
+    public RoadDetails(GameObject tempRoad)
     {
-        roadDirection = rotation * Vector3.forward;
-        roadCentrePoint = centrePoint;
-        roadWidth = width;
+        road = tempRoad;
+    }
+
+    public GameObject GetRoad()
+    {
+        return road;
     }
 
     public Vector3 GetDirection()
     {
-        return roadDirection;
+        return road.transform.rotation * Vector3.forward;
+    }
+
+    public Vector3 GetPosition()
+    {
+        return road.transform.position;
     }
 
     public Vector3 GetCentrepoint()
     {
-        return roadCentrePoint;
+        return road.transform.Find("CentrePoint").transform.position;
     }
 
     public float GetRoadWidth()
     {
-        return roadWidth;
+        return road.transform.GetChild(0).transform.localScale.x;
+    }
+
+    public float GetRoadLength()
+    {
+        return road.transform.localScale.z * road.transform.Find("RoadMesh").localScale.z;
     }
 
 }
